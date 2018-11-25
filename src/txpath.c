@@ -233,7 +233,7 @@ ProcessARP(
         && src->m_MAC_AddressSize == sizeof (MACADDR)
         && src->m_PROTO_AddressType == htons (NDIS_ETH_TYPE_IPV4)
         && src->m_PROTO_AddressSize == sizeof (IPADDR)
-        && src->m_ARP_IP_Source == adapter_ip
+        && (src->m_ARP_IP_Source & ip_netmask) == ip_network
         && (src->m_ARP_IP_Destination & ip_netmask) == ip_network
         && src->m_ARP_IP_Destination != adapter_ip)
     {
@@ -257,8 +257,9 @@ ProcessARP(
             ETH_COPY_NETWORK_ADDRESS (arp->m_MAC_Destination, Adapter->PermanentAddress);
             ETH_COPY_NETWORK_ADDRESS (arp->m_ARP_MAC_Source, mac);
             ETH_COPY_NETWORK_ADDRESS (arp->m_ARP_MAC_Destination, Adapter->PermanentAddress);
+            IPADDR source_addr = arp->m_ARP_IP_Source;
             arp->m_ARP_IP_Source = src->m_ARP_IP_Destination;
-            arp->m_ARP_IP_Destination = adapter_ip;
+            arp->m_ARP_IP_Destination = source_addr;
 
             DUMP_PACKET ("ProcessARP",
                 (unsigned char *) arp,
